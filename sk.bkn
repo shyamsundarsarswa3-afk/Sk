@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Seva - Sk Bikaner Agent Portal</title>
+    <style>
+        :root { --primary: #002D62; --gold: #D4AF37; --success: #28a745; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f7f9; }
+
+        /* Header with Agent Branding */
+        .top-bar { background: var(--primary); color: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); }
+        .agent-info { font-weight: bold; color: var(--gold); font-size: 18px; }
+
+        /* Images Dashboard */
+        .hero-slider { display: flex; overflow-x: auto; gap: 15px; padding: 20px; background: white; }
+        .card { min-width: 250px; height: 150px; position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card span { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: white; text-align: center; padding: 5px; font-size: 12px; }
+
+        .container { max-width: 800px; margin: 30px auto; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .form-header { text-align: center; padding: 20px; background: #f8f9fa; border-bottom: 1px solid #ddd; }
+        .content { padding: 30px; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-pay { background: var(--success); color: white; margin-top: 15px; }
+
+        /* Payment & Receipt */
+        #paymentArea, #receiptArea { display: none; text-align: center; }
+        .qr-box { border: 2px solid #ddd; padding: 20px; display: inline-block; margin: 20px 0; border-radius: 10px; background: #fff; }
+        
+        .receipt-box { border: 2px solid var(--primary); padding: 30px; border-radius: 10px; position: relative; text-align: left; }
+        .paid-stamp { position: absolute; top: 20px; right: 20px; border: 4px solid #28a745; color: #28a745; padding: 10px; font-size: 24px; font-weight: bold; transform: rotate(15deg); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div><h1>🌐 भारत सेवा पोर्टल</h1></div>
+    <div class="agent-info">अधिकृत एजेंट: Sk Bikaner</div>
+</div>
+
+<div class="hero-slider">
+    <div class="card"><img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400"><span>पेरिस</span></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?w=400"><span>हवाई जहाज</span></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400"><span>लंदन</span></div>
+    <div class="card"><img src="https://images.unsplash.com/photo-1548013146-72479768b949?w=400"><span>ताज महल</span></div>
+</div>
+
+<div class="container">
+    <div id="step1">
+        <div class="form-header">
+            <h3>वीजा आवेदन फॉर्म</h3>
+            <p>एजेंट कोड: SK-BKN-2026</p>
+        </div>
+        <div class="content">
+            <div class="form-group">
+                <label>आवेदक का नाम</label>
+                <input type="text" id="name" placeholder="नाम लिखें" required>
+            </div>
+            <div class="form-group">
+                <label>पासपोर्ट नंबर</label>
+                <input type="text" id="passport" placeholder="A1234567" required>
+            </div>
+            <div class="form-group">
+                <label>गंतव्य देश</label>
+                <select id="dest">
+                    <option>संयुक्त अरब अमीरात (Dubai)</option>
+                    <option>फ्रांस (Paris)</option>
+                    <option>संयुक्त राज्य अमेरिका (USA)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="showPayment()">पेमेंट के लिए आगे बढ़ें (₹500)</button>
+        </div>
+    </div>
+
+    <div id="paymentArea" class="content">
+        <h3>💳 सुरक्षित भुगतान</h3>
+        <p>एजेंट **Sk Bikaner** के माध्यम से भुगतान करें</p>
+        <div class="qr-box">
+            <div style="width:150px; height:150px; background:#eee; display:flex; align-items:center; justify-content:center; margin: 0 auto;">QR CODE</div>
+            <p>₹500.00</p>
+        </div>
+        <button class="btn btn-pay" onclick="showReceipt()">भुगतान पूर्ण करें ✓</button>
+    </div>
+
+    <div id="receiptArea" class="content">
+        <div class="receipt-box">
+            <div class="paid-stamp">PAID</div>
+            <h2 style="text-align:center; color: var(--primary);">आधिकारिक रसीद</h2>
+            <hr>
+            <p><strong>आवेदक:</strong> <span id="rName"></span></p>
+            <p><strong>पासपोर्ट:</strong> <span id="rPass"></span></p>
+            <p><strong>देश:</strong> <span id="rDest"></span></p>
+            <p><strong>प्रोसेसिंग फीस:</strong> ₹500.00</p>
+            <p><strong>हैंडलिंग एजेंट:</strong> Sk Bikaner</p>
+            <p><strong>दिनांक:</strong> <span id="rDate"></span></p>
+            <hr>
+            <button class="btn btn-primary" onclick="window.print()">रसीद डाउनलोड/प्रिंट करें</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showPayment() {
+        if(!document.getElementById('name').value || !document.getElementById('passport').value) {
+            alert("कृपया जानकारी भरें"); return;
+        }
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('paymentArea').style.display = 'block';
+    }
+
+    function showReceipt() {
+        document.getElementById('rName').innerText = document.getElementById('name').value;
+        document.getElementById('rPass').innerText = document.getElementById('passport').value;
+        document.getElementById('rDest').innerText = document.getElementById('dest').value;
+        document.getElementById('rDate').innerText = new Date().toLocaleDateString();
+
+        document.getElementById('paymentArea').style.display = 'none';
+        document.getElementById('receiptArea').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
