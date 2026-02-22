@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>विद्यार्थी करंट अफेयर्स NEWS</title>
+    <style>
+        :root { --bg: #f8f9fa; --text: #212529; --card: #ffffff; --primary: #d90429; --accent: #2b2d42; }
+        body { background: var(--bg); color: var(--text); font-family: 'Arial', sans-serif; margin: 0; transition: 0.3s; }
+        header { background: var(--accent); color: white; padding: 15px 0; text-align: center; }
+        .nav-links { display: flex; justify-content: center; gap: 20px; list-style: none; padding: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: bold; cursor: pointer; }
+        .main-container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; padding: 0 15px; }
+        .widget { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .news-card { background: var(--card); border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .news-card img { width: 100%; height: 250px; object-fit: cover; }
+        .card-body { padding: 15px; }
+        input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-pub { background: var(--primary); }
+        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>विद्यार्थी<span style="color:var(--primary)"> करंट अफेयर्स NEWS</span></h1>
+    </header>
+
+    <div class="nav-links">
+        <a onclick="window.render()">होम</a>
+        <a onclick="window.filter('देश')">देश</a>
+        <a onclick="window.filter('दुनिया')">दुनिया</a>
+        <a onclick="window.filter('राजस्थान')">राजस्थान</a>
+        <a onclick="window.filter('टेक्नोलॉजी')">टेक</a>
+    </div>
+
+    <div class="main-container">
+        <main id="news-feed">
+            <h3 style="text-align:center;">खबरें लोड हो रही हैं...</h3>
+        </main>
+
+        <aside>
+            <div class="widget">
+                <h3>तारीख से खबर देखें</h3>
+                <input type="date" id="calendar-filter" onchange="window.filterByDate()">
+            </div>
+
+            <div class="widget" style="background: #e9ecef;">
+                <h3>एडमिन: न्यूज़ जोड़ें</h3>
+                <input type="text" id="nt" placeholder="खबर की हेडलाइन">
+                <select id="nc">
+                    <option value="देश">देश</option>
+                    <option value="दुनिया">दुनिया</option>
+                    <option value="राजस्थान">राजस्थान</option>
+                    <option value="टेक्नोलॉजी">टेक्नोलॉजी</option>
+                </select>
+                <textarea id="nd" rows="3" placeholder="खबर का पूरा विवरण"></textarea>
+                <input type="file" id="ni" accept="image/*">
+                <button class="btn btn-pub" onclick="window.publishNews()">पब्लिश करें</button>
+            </div>
+        </aside>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJQjcKwu7J9-75RfZXt-UAePXCoCk44dU",
+            authDomain: "vidyarthi-b7b5e.firebaseapp.com",
+            databaseURL: "https://vidyarthi-b7b5e-default-rtdb.firebaseio.com",
+            projectId: "vidyarthi-b7b5e",
+            storageBucket: "vidyarthi-b7b5e.firebasestorage.app",
+            messagingSenderId: "232879098994",
+            appId: "1:232879098994:web:abcfcd897a1939fd7a06eb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const newsRef = ref(db, 'news');
+        const ADMIN_PASS = "admin95251500"; 
+
+        let allNews = [];
+
+        window.publishNews = function() {
+            const pass = prompt("एडमिन पासवर्ड डालें:");
+            if(pass !== ADMIN_PASS) return alert("गलत पासवर्ड!");
+
+            const t = document.getElementById('nt').value;
+            const c = document.getElementById('nc').value;
+            const d = document.getElementById('nd').value;
+            const i = document.getElementById('ni').files[0];
+
+            if(!t || !i) return alert("कृपया हेडलाइन और फोटो ज़रूर चुनें!");
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                push(newsRef, {
+                    title: t,
+                    cat: c,
+                    desc: d,
+                    img: e.target.result,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                alert("न्यूज़ सफलतापूर्वक पब्लिश हो गई!");
+                document.getElementById('nt').value = '';
+                document.getElementById('nd').value = '';
+                document.getElementById('ni').value = '';
+            };
+            reader.readAsDataURL(i);
+        }
+
+        onValue(newsRef, (snap) => {
+            const data = snap.val();
+            allNews = data ? Object.keys(data).map(k => ({id: k, ...data[k]})) : [];
+            allNews.sort((a,b) => b.id.localeCompare(a.id)); 
+            window.render(allNews);
+        });
+
+        window.render = (data = allNews) => {
+            const feed = document.getElementById('news-feed');
+            feed.innerHTML = data.length ? '' : '<h3>कोई खबर नहीं मिली।</h3>';
+            data.forEach(n => {
+                feed.innerHTML += `
+                <div class="news-card">
+                    <img src="${n.img}">
+                    <div class="card-body">
+                        <span style="background:var(--primary);color:white;padding:2px 8px;border-radius:3px;font-size:12px;">${n.cat}</span>
+                        <small style="float:right">${n.date}</small>
+                        <h2>${n.title}</h2>
+                        <p>${n.desc}</p>
+                        <button onclick="window.delPost('${n.id}')" style="color:red;border:none;background:none;cursor:pointer;font-weight:bold;">🗑 डिलीट</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        window.delPost = (id) => {
+            if(prompt("डिलीट करने के लिए पासवर्ड डालें:") === ADMIN_PASS) {
+                remove(ref(db, 'news/' + id));
+            } else {
+                alert("गलत पासवर्ड!");
+            }
+        }
+
+        window.filter = (cat) => window.render(allNews.filter(n => n.cat === cat));
+        window.filterByDate = () => {
+            const dateVal = document.getElementById('calendar-filter').value;
+            window.render(allNews.filter(n => n.date === dateVal));
+        }
+    </script>
+</body>
+</html>
